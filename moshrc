@@ -46,7 +46,7 @@ EOF
 
             echo $'$(tar czf - -h -C $SSHHOME $files | xxd -p)' | xxd -p -r | tar mxzf - -C \$SSHHOME
             export SSHHOME=\$SSHHOME
-            bash --rcfile \$SSHHOME/sshrc.bashrc
+            exec bash --rcfile \$SSHHOME/sshrc.bashrc
             "
     else
         echo "No such file: $SSHHOME/.sshrc"
