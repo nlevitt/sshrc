@@ -26,9 +26,7 @@ function sshrc() {
         else
             WELCOME_MSG=""
         fi
-        set -x
         "$SSHCOMMAND" $SSHCOMMAND_ARG "$DOMAIN" $SSHARGS -- /bin/bash -c "\
-            set -x
             command -v openssl >/dev/null 2>&1 || { echo >&2 \"sshrc requires openssl to be installed on the server, but it's not. Aborting.\"; exit 1; }
             $WELCOME_MSG
             export SSHHOME=\$(mktemp -d ~/.$(whoami).sshrc.XXXX)
