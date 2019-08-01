@@ -48,9 +48,9 @@ EOF
             echo $'$(tar czf - -h -C $SSHHOME $files | xxd -p)' | xxd -p -r | tar mxzf - -C \$SSHHOME
             export SSHHOME=\$SSHHOME
             if [ -z \"$CMDARGS\" ];then
-              bash --rcfile \$SSHHOME/sshrc.bashrc
+              exec bash --rcfile \$SSHHOME/sshrc.bashrc
             else
-              bash --rcfile \$SSHHOME/sshrc.bashrc -c \"$CMDARGS\"
+              exec bash --rcfile \$SSHHOME/sshrc.bashrc -c \"$CMDARGS\"
             fi
             "
     else
