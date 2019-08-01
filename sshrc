@@ -15,7 +15,7 @@ function sshrc() {
             echo >&2 $'.sshrc.d and .sshrc files must be less than 64kb\ncurrent size: '$SIZE' bytes'
             exit 1
         fi
-        if [ -z "$CMDARG" -a ! -e ~/.sshrc.d/.hushlogin ]; then
+        if [ -z "$CMDARG" -a ! -e ~/.sshrc.d/.hushlogin -a ! -e $SSHHOME/.sshrc.d/.hushlogin ]; then
             WELCOME_MSG="
                 if [ ! -e ~/.hushlogin ]; then
                     if [ -e /etc/motd ]; then cat /etc/motd; fi
