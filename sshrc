@@ -26,7 +26,9 @@ function sshrc() {
         else
             WELCOME_MSG=""
         fi
-        "$SSHCOMMAND" $SSHCOMMAND_ARG "$DOMAIN" $SSHARGS -- $(if [ "$SSHCOMMAND" == "mosh" ]; then echo "/bin/bash -c"; fi) "
+        set -x
+        "$SSHCOMMAND" $SSHCOMMAND_ARG "$DOMAIN" $SSHARGS -- /bin/bash -c "\
+            set -x
             command -v openssl >/dev/null 2>&1 || { echo >&2 \"sshrc requires openssl to be installed on the server, but it's not. Aborting.\"; exit 1; }
             $WELCOME_MSG
             export SSHHOME=\$(mktemp -d ~/.$(whoami).sshrc.XXXX)
@@ -34,10 +36,7 @@ function sshrc() {
             trap \"rm -rf \$SSHRCCLEANUP; exit\" 0
             echo $'$(cat "$0" | openssl enc -base64)' | tr -s ' ' $'\n' | openssl enc -base64 -d > \$SSHHOME/sshrc
             chmod +x \$SSHHOME/sshrc
-            if [ \"$(which moshrc)\" != \"\" ];then
-              echo $'"$(cat $(which moshrc) | openssl enc -base64)"' | tr -s ' ' $'\n' | openssl enc -base64 -d > \$SSHHOME/moshrc
-              chmod +x \$SSHHOME/moshrc
-            fi
+            ln -s \$SSHHOME/sshrc \$SSHHOME/moshrc
 
             echo $'$( cat << 'EOF' | openssl enc -base64
                 if [ -r /etc/profile ]; then source /etc/profile; fi
@@ -66,10 +65,11 @@ EOF
             chmod +x \$SSHHOME/bashsshrc
 
             echo $'$(tar czf - -h -C $SSHHOME $files | openssl enc -base64)' | tr -s ' ' $'\n' | openssl enc -base64 -d | tar mxzf - -C \$SSHHOME
+
             export SSHHOME=\$SSHHOME
             echo \"$CMDARG\" >> \$SSHHOME/sshrc.bashrc
             exec bash --rcfile \$SSHHOME/sshrc.bashrc
-            "
+        "
     else
         echo "No such file: $SSHHOME/.sshrc" >&2
         exit 1
@@ -106,7 +106,7 @@ if [ "$SSHCOMMAND" == "sshrc" ]; then
   SSHCOMMAND_ARG="-t"
 elif [ "$SSHCOMMAND" == "moshrc" ]; then
   SSHCOMMAND="mosh"
-  SSHCOMMAND_ARG=""
+  SSHCOMMAND_ARG="--no-init"
 fi
 sshrc_parse "$@"
 sshrc
